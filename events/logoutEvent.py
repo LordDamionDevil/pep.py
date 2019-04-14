@@ -1,6 +1,8 @@
 import time
 import json
+import datetime
 
+from common.akatsuki.discord_hooks import Webhook
 from common.log import logUtils as log
 from constants import serverPackets
 from helpers import chatHelper as chat
@@ -53,5 +55,7 @@ def handle(userToken, _=None, deleteToken=True):
 				"newUsername": newUsername.decode("utf-8")
 			}))
 
+		ts = time.time()
+		st = datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S')
 		# Console output
-		log.info("{} has been disconnected. (logout)".format(username))
+		log.info("{} - {} has been disconnected. (logout)".format(st, username), discord="log")

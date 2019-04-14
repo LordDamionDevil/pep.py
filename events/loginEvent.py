@@ -1,7 +1,9 @@
 import sys
 import time
 import traceback
+import datetime
 
+from common.akatsuki.discord_hooks import Webhook
 from common.constants import privileges
 from common.log import logUtils as log
 from common.ripple import userUtils
@@ -110,17 +112,23 @@ def handle(tornadoRequest):
 		# Check restricted mode (and eventually send message)
 		responseToken.checkRestricted()
 
+		ts = time.time()
+		st = datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S')
+
+		username = userUtils.getUsername(userID)
+		log.info("{} - {} has logged in.".format(st, username), discord="log")
+
 		# Send message if donor expires soon
 		if responseToken.privileges & privileges.USER_DONOR > 0:
 			expireDate = userUtils.getDonorExpire(responseToken.userID)
 			if expireDate-int(time.time()) <= 86400*3:
 				expireDays = round((expireDate-int(time.time()))/86400)
 				expireIn = "{} days".format(expireDays) if expireDays > 1 else "less than 24 hours"
-				responseToken.enqueue(serverPackets.notification("Your donor tag expires in {}! When your donor tag expires, you won't have any of the donor privileges, like yellow username, custom badge and discord custom role and username color! If you wish to keep supporting Ripple and you don't want to lose your donor privileges, you can donate again by clicking on 'Support us' on Ripple's website.".format(expireIn)))
+				responseToken.enqueue(serverPackets.notification("Your donor tag expires in {}! When your donor tag expires, you won't have any of the donor privileges, like yellow username, custom badge and discord custom role and username color! If you wish to keep supporting Atoka and you don't want to lose your donor privileges, you can donate again by clicking on 'Support us' on Atoka's website.".format(expireIn)))
 
 		# Deprecate telegram 2fa and send alert
 		if userUtils.deprecateTelegram2Fa(userID):
-			responseToken.enqueue(serverPackets.notification("As stated on our blog, Telegram 2FA has been deprecated on 29th June 2018. Telegram 2FA has just been disabled from your account. If you want to keep your account secure with 2FA, please enable TOTP-based 2FA from our website https://ripple.moe. Thank you for your patience."))
+			responseToken.enqueue(serverPackets.notification("As stated on our blog, Telegram 2FA has been deprecated on 29th June 2018. Telegram 2FA has just been disabled from your account. If you want to keep your account secure with 2FA, please enable TOTP-based 2FA from our website https://atoka.pw. Thank you for your patience."))
 
 		# Set silence end UNIX time in token
 		responseToken.silenceEndTime = userUtils.getSilenceEnd(userID)
@@ -185,31 +193,26 @@ def handle(tornadoRequest):
 		# Send main menu icon
 		if glob.banchoConf.config["menuIcon"] != "":
 			responseToken.enqueue(serverPackets.mainMenuIcon(glob.banchoConf.config["menuIcon"]))
-
 		# Send online users' panels
 		with glob.tokens:
 			for _, token in glob.tokens.tokens.items():
 				if not token.restricted:
 					responseToken.enqueue(serverPackets.userPanel(token.userID))
 
-		# Get location and country from ip.zxq.co or database
-		if glob.localize:
-			# Set location to 0,0 and get country from db
-			log.warning("Location skipped")
-			latitude = 0
-			longitude = 0
-			countryLetters = "XX"
-			country = countryHelper.getCountryID(userUtils.getCountry(userID))
-		else:
+		#Set values to 0 to modify after
+		latitude = 0
+		longitude = 0
+		countryLetters = userUtils.getCountry(userID)
+		if (glob.localize and (priv & privileges.USER_DONOR == 0 or countryLetters == "XX")):
 			# Get location and country from IP
 			latitude, longitude = locationHelper.getLocation(requestIP)
 			countryLetters = locationHelper.getCountry(requestIP)
-			country = countryHelper.getCountryID(countryLetters)
-
+			userUtils.setCountry(userID, countryLetters)
 
 		# Set location and country
 		responseToken.setLocation(latitude, longitude)
-		responseToken.country = country
+		responseToken.country = countryHelper.getCountryID(countryLetters)
+
 
 		# Set country in db if user has no country (first bancho login)
 		if userUtils.getCountry(userID) == "XX":

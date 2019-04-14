@@ -15,8 +15,10 @@ def forceUpdate():
 	return packetHelper.buildPacket(packetIDs.server_userID, [[-2, dataTypes.SINT32]])
 
 def loginBanned():
-	packets = packetHelper.buildPacket(packetIDs.server_userID, [[-1, dataTypes.SINT32]])
-	packets += notification("You are banned. You can appeal after one month since your ban by sending an email to support@atoka.pw from the email address you've used to sign up.")
+	packets = packetHelper.buildPacket(packetIDs.server_userID, [[-1, dataTypes.SINT32]]) # Denies connection to server.
+	packets += packetHelper.buildPacket(packetIDs.server_silenceEnd, [[2147483647, dataTypes.SINT32]]) # Locks the client.
+	packets += notification("Who's that Pokemon?!") # Sends notification.
+	packets += rtx("Its..! You are banned. This is non negotiable. You have broken our trust with you beyond repair. Go find another place to play.") # Sends RTX (jumpscare) message.
 	return packets
 
 def loginLocked():
@@ -173,7 +175,7 @@ def channelKicked(chan):
 def userSilenced(userID):
 	return packetHelper.buildPacket(packetIDs.server_userSilenced, [[userID, dataTypes.UINT32]])
 
-
+immuneUsers = 1001
 """ Spectator packets """
 def addSpectator(userID):
 	return packetHelper.buildPacket(packetIDs.server_spectatorJoined, [[userID, dataTypes.SINT32]])

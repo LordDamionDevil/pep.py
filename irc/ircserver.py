@@ -350,9 +350,9 @@ class Client:
 			chat.IRCConnect(self.banchoUsername)
 
 			# IRC reply
-			self.replyCode(1, "Welcome to the Internet Relay Network")
+			self.replyCode(1, "Welcome to the Atoka IRC!")
 			self.replyCode(2, "Your host is {}, running version pep.py-{}".format(self.server.host, glob.VERSION))
-			self.replyCode(3, "This server was created since the beginning")
+			self.replyCode(3, "This server was created by the Ripple Team and modified by the Atoka Team.")
 			self.replyCode(4, "{} pep.py-{} o o".format(self.server.host, glob.VERSION))
 			self.sendLusers()
 			self.sendMotd()
@@ -565,7 +565,7 @@ class Server:
 		self.host = glob.conf.config["irc"]["hostname"]
 		self.port = port
 		self.clients = {}  # Socket - - > Client instance.
-		self.motd = ["Welcome to pep.py's embedded IRC server!", "This is a VERY simple IRC server and it's still in beta.", "Expect things to crash and not work as expected :("]
+		self.motd = ["Welcome to Atoka's embedded IRC server!", "This is a VERY simple IRC server and it's still in beta.", "Expect things to crash and not work as expected. This server is running pep.py v{}".format(glob.VERSION)]
 
 	def forceDisconnection(self, username, isBanchoUsername=True):
 		"""
