@@ -19,6 +19,7 @@
 
 - Anything you take, borrow, or otherwise use that we made ourselves (ourselves meaning osu!Atoka) we require that you give credit to us (us meaning osu!Atoka).
 
+## Features
 
 This is Atoka's bancho server. It handles:
 - Client login
