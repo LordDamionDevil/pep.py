@@ -54,8 +54,3 @@ def handle(userToken, _=None, deleteToken=True):
 				"userID": userID,
 				"newUsername": newUsername.decode("utf-8")
 			}))
-
-		ts = time.time()
-		st = datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S')
-		# Console output
-		log.info("{} - {} has been disconnected. (logout)".format(st, username), discord="log")
