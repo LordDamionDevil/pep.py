@@ -112,12 +112,6 @@ def handle(tornadoRequest):
 		# Check restricted mode (and eventually send message)
 		responseToken.checkRestricted()
 
-		ts = time.time()
-		st = datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S')
-
-		username = userUtils.getUsername(userID)
-		log.info("{} - {} has logged in.".format(st, username), discord="log")
-
 		# Send message if donor expires soon
 		if responseToken.privileges & privileges.USER_DONOR > 0:
 			expireDate = userUtils.getDonorExpire(responseToken.userID)
